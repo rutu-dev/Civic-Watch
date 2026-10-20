@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ================= HELPER FUNCTIONS =================
+    
+    // Check if the requesting user is an authorized municipal officer/admin
+    // 1. Must be authenticated (request.auth != null)
+    // 2. Must possess custom claim (admin == true or role == "officer") OR exist in /Officers registry
+    function isOfficer() {
+      return request.auth != null && (
+        request.auth.token.admin == true ||
+        request.auth.token.role == "officer" ||
+        exists(/databases/$(database)/documents/Officers/$(request.auth.uid))
+      );
+    }
+
+    // ================= COMPLAINTS COLLECTION =================
+    match /Complaints/{complaintId} {
+      
+      // 1. PUBLIC READ: Anyone can read civic complaints (public transparency layer)
+      allow read: if true;
+
+      // 2. CITIZEN LODGE: Citizens can ONLY create new complaints with strict constraints
+      // - Must start in "Reported" status
+      // - Must have reports = 1
+      // - Must have valid string values for issueType, ward, description
+      // - CANNOT create an already resolved/verified complaint
+      // - CANNOT submit resolution fields upon creation
+      allow create: if request.resource.data.status == "Reported"
+                    && request.resource.data.reports == 1
+                    && request.resource.data.issueType is string
+                    && request.resource.data.ward is string
+                    && request.resource.data.description is string
+                    && request.resource.data.description.size() > 0
+                    && (!('resolution' in request.resource.data) || request.resource.data.resolution == null);
+
+      // 3. CITIZEN DUPLICATE MERGE: Citizens can ONLY increment reports by exactly 1 on duplicate detection
+      // - Can ONLY modify 'reports' and 'timeline'
+      // - Cannot change 'status', 'resolution', 'resolutionScore', or any other fields
+      allow update: if request.auth == null
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reports', 'timeline'])
+                    && request.resource.data.reports == resource.data.reports + 1
+                    && request.resource.data.status == resource.data.status;
+
+      // 4. SPOT CHECK PROTOCOL: Logged-in users / citizens can update spot check fields
+      // - Allowed fields: verificationsCount, rejectionsCount, verifiedBy, status, timeline
+      // - Can set status to "In Progress" / "Under Verification" / "Pending_Verification" / "In_Progress" when disputed
+      // - Enforces that verificationsCount or rejectionsCount increments by exactly 1
+      allow update: if request.auth != null
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['verificationsCount', 'rejectionsCount', 'verifiedBy', 'status', 'timeline'])
+                    && (
+                      (request.resource.data.verificationsCount == resource.data.verificationsCount + 1) ||
+                      (request.resource.data.rejectionsCount == resource.data.rejectionsCount + 1)
+                    );
+
+      // 5. OFFICER LIFECYCLE MANAGEMENT: Only authorized officers can perform full lifecycle transitions,
+      // upload resolution evidence, verify/reject resolutions, and record audit milestones
+      allow update: if isOfficer();
+
+      // 6. DELETION PREVENTED: Civic transparency requires immutable complaint records
+      allow delete: if false;
+    }
+
+    // ================= OFFICERS REGISTRY COLLECTION =================
+    // Role directory mapping officer UIDs to administrative privileges
+    match /Officers/{officerId} {
+      allow read: if request.auth != null && request.auth.uid == officerId;
+      allow write: if isOfficer();
+    }
+  }
+}

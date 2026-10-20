@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | CivicWatch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">CIVIC<span>WATCH</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- LOGIN FORM CONTAINER -->
+    <div class="admin-wrapper" style="max-width: 400px; margin: 60px auto; padding: 20px;">
+        <header class="admin-header" style="text-align: center; margin-bottom: 20px;">
+            <h1>Officer Login</h1>
+        </header>
+
+        <div class="table-card" style="padding: 24px;">
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <label for="email" style="display: block; margin-bottom: 5px; font-weight: 600;">Email</label>
+                    <input type="email" id="email" placeholder="Admin Email" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div>
+                    <label for="password" style="display: block; margin-bottom: 5px; font-weight: 600;">Password</label>
+                    <input type="password" id="password" placeholder="Password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <button type="submit" style="padding: 10px; background-color: #002b49; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">Login</button>
+            </form>
+
+            <p id="msg" style="margin-top: 15px; text-align: center; color: #d9534f; font-weight: 600;"></p>
+        </div>
+    </div>
+
+    <!-- AUTH SCRIPT -->
+    <script type="module" src="admin-auth.js"></script>
+
+</body>
+</html>

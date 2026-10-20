@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Dashboard | CivicWatch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">CIVIC<span>WATCH</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="report.html">Report Issue</a>
+                <a href="issues.html" class="active">View Issues</a>
+                <a href="admin.html">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-container">
+        
+        <!-- HEADER & FILTER BAR -->
+        <div class="filter-container">
+            <div>
+                <h2 style="font-size: 1.4rem; margin-bottom: 4px;">Public Transparency Feed</h2>
+                <p style="color: #64748b; font-size: 0.88rem;">
+                    Real-time citizen reports, SLA pending timers, and verified resolution evidence.
+                </p>
+            </div>
+
+            <div class="filter-group">
+                <div>
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="ALL">All Statuses</option>
+                        <option value="Reported">Reported</option>
+                        <option value="Acknowledged">Acknowledged</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolution Submitted">Pending Verification</option>
+                        <option value="Resolved">Resolved & Verified</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="wardFilter">Ward:</label>
+                    <select id="wardFilter" class="filter-select">
+                        <option value="ALL">All Wards</option>
+                        <option value="Ward A">Ward A</option>
+                        <option value="Ward B">Ward B</option>
+                        <option value="Ward C">Ward C</option>
+                    </select>
+                </div>
+
+                <button type="button" class="btn-sm btn-info" onclick="openScoringExplainerModal()" style="margin-left: 4px;">
+                    ℹ How Scoring Works
+                </button>
+            </div>
+        </div>
+
+        <div class="content-grid">
+
+            <!-- PUBLIC ISSUES GRID -->
+            <section class="issues-feed">
+                <!-- REQUIRED ID -->
+                <div id="issuesGrid" class="issues-grid"></div>
+            </section>
+
+            <!-- WARD PERFORMANCE SIDEBAR -->
+            <aside class="sidebar">
+                <div class="stats-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin-bottom: 0;">Ward Performance</h3>
+                        <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">100-PT SYSTEM</span>
+                    </div>
+                    <!-- REQUIRED ID -->
+                    <div id="wardDashboard"></div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- ================= PUBLIC PROOF & TIMELINE MODAL ================= -->
+    <div id="publicProofModal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3 id="publicModalTitle">Proof-of-Resolution & Audit Timeline</h3>
+                <button type="button" class="modal-close-btn" onclick="closePublicProofModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- BEFORE VS AFTER PROOF -->
+                <div class="proof-comparison-grid">
+                    <div class="proof-card">
+                        <div class="proof-header before">BEFORE: Citizen Report Photo</div>
+                        <div id="publicModalBeforeContainer"></div>
+                    </div>
+                    <div class="proof-card">
+                        <div class="proof-header after">AFTER: Resolution Evidence</div>
+                        <div id="publicModalAfterContainer"></div>
+                    </div>
+                </div>
+
+                <!-- RESOLUTION SUMMARY & VERIFICATION BADGE -->
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 1.2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+                        <span id="publicModalVerificationBadge" class="verified-badge">
+                            ✓ Verified by CivicWatch Municipal Officer
+                        </span>
+                        <span id="publicModalEvidenceTypeBadge" style="font-size: 0.75rem; color: #64748b;">
+                            Official Firebase Storage Evidence
+                        </span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #1e293b; margin-top: 6px;">
+                        <strong>Work Performed:</strong> <span id="publicModalDescription">-</span>
+                    </div>
+                </div>
+
+                <!-- GROUND SPOT CHECK CONTAINER -->
+                <div id="publicModalSpotCheckContainer" style="margin-bottom: 1.2rem; display: none;"></div>
+
+                <!-- RESOLUTION SCORE HERO & BREAKDOWN -->
+                <div class="score-hero-container">
+                    <div>
+                        <div style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8;">
+                            Resolution Quality Score
+                        </div>
+                        <div class="score-hero-val" id="publicModalScoreVal">
+                            0 <span>/ 100</span>
+                        </div>
+                        <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 4px;" id="publicModalScoreSummary">
+                            Rule-based score calculated from verification, SLA timeliness, and evidence completeness.
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="button" class="btn-sm btn-info" onclick="openScoringExplainerModal()">Formula Details</button>
+                    </div>
+                </div>
+
+                <!-- SCORE BREAKDOWN TABLE -->
+                <table class="score-breakdown-table">
+                    <tbody>
+                        <tr>
+                            <td>Verification Quality (Formal Officer Audit)</td>
+                            <td id="publicScoreVerif">-</td>
+                        </tr>
+                        <tr>
+                            <td>Timeliness vs Severity SLA</td>
+                            <td id="publicScoreTime">-</td>
+                        </tr>
+                        <tr>
+                            <td>Evidence Completeness (After-Photo & Notes)</td>
+                            <td id="publicScoreEvid">-</td>
+                        </tr>
+                        <tr>
+                            <td>Penalties (Rejections / Reopenings)</td>
+                            <td id="publicScorePenalties" style="color: #dc2626;">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- LIFECYCLE AUDIT TIMELINE -->
+                <div style="margin-top: 1.5rem;">
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">
+                        Issue Lifecycle Audit Trail
+                    </h4>
+                    <div class="timeline-list" id="publicModalTimelineContainer"></div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-dark" onclick="closePublicProofModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SCORING EXPLAINER MODAL ================= -->
+    <div id="scoringExplainerModal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 640px;">
+            <div class="modal-header">
+                <h3>How Scoring & Ward Metrics Work</h3>
+                <button type="button" class="modal-close-btn" onclick="closeScoringExplainerModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="font-size: 0.9rem; line-height: 1.5; color: #334155;">
+                <p style="margin-bottom: 1rem;">
+                    CivicWatch uses a <strong>100% transparent, rule-based algorithm</strong>. Scores are not generated by black-box AI; every point is deterministically calculated from verifiable civic actions.
+                </p>
+
+                <h4 style="color: #0f172a; margin-top: 1rem; margin-bottom: 0.4rem;">1. Resolution Score (0–100 Points)</h4>
+                <ul style="padding-left: 1.2rem; margin-bottom: 1rem;">
+                    <li><strong>Verification Quality (Max 40 pts):</strong> +40 for certified officer Before/After verification; +25 for submitted work; +10 for legacy direct resolution.</li>
+                    <li><strong>SLA Timeliness (Max 30 pts):</strong> Based on severity SLA (Open Manhole: 2 days, Drainage: 3 days, Pothole/Water: 5 days, Streetlight/Garbage: 7 days). Resolved within SLA = +30 pts; $\le 2\times$ SLA = +20 pts.</li>
+                    <li><strong>Evidence Completeness (Max 30 pts):</strong> +15 for official Firebase Storage photo; +10 for work description $\ge 20$ chars; +5 for citizen before photo comparison.</li>
+                    <li><strong>Penalties:</strong> -15 for rework rejection; -20 if reopened after resolution.</li>
+                </ul>
+
+                <h4 style="color: #0f172a; margin-top: 1rem; margin-bottom: 0.4rem;">2. Ward Performance Score (0–100 Points)</h4>
+                <p style="margin-bottom: 0.5rem;">
+                    Wards are evaluated using weighted accountability metrics:
+                </p>
+                <div style="background: #f1f5f9; padding: 0.8rem; border-radius: 8px; font-family: monospace; font-size: 0.82rem; margin-bottom: 1rem;">
+                    Ward Score = (30% × Resolution Rate) + (20% × Timeliness Score) + (20% × Avg Resolution Score) + (10% × High Priority Rate) + (10% × Evidence Rate) + (10% × Reopen Discipline)
+                </div>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                    <strong>Sample Size Notice:</strong> Wards with fewer than 3 complaints display a <em>"Low Sample Size"</em> badge to prevent statistical distortion.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-dark" onclick="closeScoringExplainerModal()">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE + SCRIPT (MODULE REQUIRED) -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>
+

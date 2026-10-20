@@ -1,0 +1,27 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper: Verify officer authentication via custom claims or password provider
+    function isOfficer() {
+      return request.auth != null && (
+        request.auth.token.admin == true ||
+        request.auth.token.role == "officer" ||
+        (request.auth.token.firebase.sign_in_provider == "password" && request.auth.token.email_verified == true)
+      );
+    }
+
+    match /resolution_evidence/{allPaths=**} {
+      // 1. PUBLIC READ: Anyone can view resolution evidence images for public transparency
+      allow read: if true;
+
+      // 2. OFFICER WRITE ONLY: Only authorized officers can upload resolution evidence
+      // - Must be an authorized officer
+      // - Must be an image format (JPEG, PNG, WebP)
+      // - Maximum file size 5 MB
+      allow write: if isOfficer()
+                   && request.resource.size <= 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

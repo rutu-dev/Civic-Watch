@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue | CivicWatch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="form-page">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">CIVIC<span>WATCH</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="report.html" class="active">Report Issue</a>
+                <a href="issues.html">View Issues</a>
+                <a href="admin.html">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FORM SECTION -->
+    <div class="form-overlay-container">
+        <img 
+            src="https://images.unsplash.com/photo-1517090504586-fde19ea6066f?auto=format&fit=crop&w=1920&q=80"
+            alt="City Background"
+            class="bg-img"
+        >
+
+        <div class="card-container">
+            <div class="form-card">
+
+                <h2>Lodge a Complaint</h2>
+                <p class="form-subtitle">
+                    Help improve your city by reporting civic infrastructure issues.
+                </p>
+
+                <!-- FORM (ID MUST MATCH JS) -->
+                <form id="reportForm">
+
+                    <div class="form-group">
+                        <label>Issue Type <span>*</span></label>
+                        <select id="issueType" required>
+                            <option value="">Select Issue</option>
+                            <option>Pothole</option>
+                            <option>Garbage Overflow</option>
+                            <option>Broken Streetlight</option>
+                            <option>Open Manhole</option>
+                            <option>Water Leakage</option>
+                             <option>Drainage Blockage</option> 
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ward / Area <span>*</span></label>
+                        <select id="ward" required>
+                            <option value="">Select Ward</option>
+                            <option>Ward A</option>
+                            <option>Ward B</option>
+                            <option>Ward C</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Issue Description <span>*</span></label>
+                        <textarea
+                            id="description"
+                            rows="4"
+                            placeholder="Example: Garbage bins near main road have been overflowing for 3 days"
+                            required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image URL (optional)</label>
+                        <input
+                            type="url"
+                            id="imageUrl"
+                            placeholder="Paste image link (Google Drive / WhatsApp)">
+                        <small class="hint-text">
+                            Optional — direct camera upload can be added later
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        Submit Report
+                    </button>
+
+                </form>
+
+                <!-- STATUS MESSAGE -->
+                <p id="message" class="form-message"></p>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>

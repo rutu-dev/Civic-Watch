@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicWatch | Transparent Infrastructure Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">CIVIC<span>WATCH</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="report.html">Report Issue</a>
+                <a href="issues.html">View Issues</a>
+                <a href="admin.html">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="hero">
+        <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1920&q=80"
+             alt="Smart City"
+             class="hero-bg">
+        <div class="overlay"></div>
+
+        <div class="hero-content">
+            <h1>Transparent Civic Infrastructure Monitoring</h1>
+            <p>
+                Empowering citizens to report, track, and resolve
+                urban infrastructure challenges in real-time.
+            </p>
+            <div class="hero-btns">
+                <a href="report.html" class="btn btn-primary">Report an Issue</a>
+                <a href="issues.html" class="btn btn-secondary">Explore Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- WARD PERFORMANCE SECTION -->
+    <section class="dashboard-container">
+        <h2 style="text-align:center; margin-bottom:1.5rem">
+            Ward Performance Overview
+        </h2>
+
+        <!-- REQUIRED ID FOR BACKEND -->
+        <div id="wardDashboard"></div>
+    </section>
+
+    <!-- FIREBASE + SCRIPT (MODULE REQUIRED) -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>

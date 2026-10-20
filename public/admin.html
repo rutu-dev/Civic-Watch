@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officer Control Panel | CivicWatch</title>
+    
+    <!-- GUARD SCRIPT: Checks auth before rendering body -->
+    <script type="module" src="admin-guard.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<!-- HIDE BODY BY DEFAULT (admin-guard.js reveals it if authorized) -->
+<body class="bg-light" style="display: none;">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">CIVIC<span>WATCH</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="issues.html">Public Feed</a>
+                <a href="admin.html" class="active">Admin Panel</a>
+                <button id="logoutBtn" style="background: transparent; border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ADMIN PANEL WRAPPER -->
+    <div class="admin-wrapper">
+        <header class="admin-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1>Officer Control Panel</h1>
+                <p style="color: #64748b; font-size: 0.95rem; margin-top: 4px;">
+                    Proof-of-Resolution Engine & Ward Performance Command Center
+                </p>
+            </div>
+            <div id="adminOfficerBadge" style="background: #e2e8f0; padding: 6px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; color: #334155;">
+                Authorized Officer Session
+            </div>
+        </header>
+
+        <!-- KPI SUMMARY CARDS -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Total Complaints</div>
+                <div class="kpi-value" id="kpiTotalComplaints">0</div>
+                <div class="kpi-subtext">All-time lodged cases</div>
+            </div>
+            <div class="kpi-card kpi-warning">
+                <div class="kpi-title">Active / In Progress</div>
+                <div class="kpi-value" id="kpiActiveComplaints">0</div>
+                <div class="kpi-subtext">Requires field action</div>
+            </div>
+            <div class="kpi-card kpi-purple">
+                <div class="kpi-title">Pending Verification</div>
+                <div class="kpi-value" id="kpiPendingVerification">0</div>
+                <div class="kpi-subtext">Awaiting proof review</div>
+            </div>
+            <div class="kpi-card kpi-success">
+                <div class="kpi-title">Resolved Cases</div>
+                <div class="kpi-value" id="kpiResolvedComplaints">0</div>
+                <div class="kpi-subtext">Verified & completed</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Avg Resolution Score</div>
+                <div class="kpi-value" id="kpiAvgResolutionScore">0<span style="font-size: 1rem; font-weight: normal; color: #64748b;">/100</span></div>
+                <div class="kpi-subtext">Quality & SLA benchmark</div>
+            </div>
+            <div class="kpi-card kpi-success">
+                <div class="kpi-title">Overall Resolution Rate</div>
+                <div class="kpi-value" id="kpiResolutionRate">0%</div>
+                <div class="kpi-subtext">Platform-wide clearance</div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="tab-active-complaints">Active Complaints</button>
+            <button class="tab-btn" data-tab="tab-verification-queue">
+                Verification Queue <span id="queueCountBadge" style="background:#ea580c; color:white; padding:1px 6px; border-radius:10px; font-size:0.75rem; margin-left:4px;">0</span>
+            </button>
+            <button class="tab-btn" data-tab="tab-ward-rankings">Ward Performance & Rankings</button>
+            <button class="tab-btn" data-tab="tab-category-matrix">Category Performance</button>
+        </div>
+
+        <!-- TAB 1: ACTIVE COMPLAINTS MANAGEMENT -->
+        <div id="tab-active-complaints" class="tab-pane active">
+            <div class="table-card">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700;">Complaints Management</h3>
+                    <span style="font-size: 0.85rem; color: #64748b;">Advance complaints through verified lifecycle stages</span>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Issue</th>
+                            <th>Ward</th>
+                            <th>Date / SLA</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Score</th>
+                            <th>Lifecycle Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 2: VERIFICATION QUEUE -->
+        <div id="tab-verification-queue" class="tab-pane">
+            <div class="table-card">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700;">Resolution Verification Queue</h3>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">
+                        Inspect submitted Before vs After evidence and certify resolution quality
+                    </p>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Before Photo</th>
+                            <th>After Evidence</th>
+                            <th>Issue & Ward</th>
+                            <th>Submitted Notes</th>
+                            <th>Evidence Type</th>
+                            <th>Resolution Score</th>
+                            <th>Verification Decision</th>
+                        </tr>
+                    </thead>
+                    <tbody id="verificationQueueTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: WARD PERFORMANCE & RANKINGS -->
+        <div id="tab-ward-rankings" class="tab-pane">
+            <div class="table-card">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700;">Municipal Ward Performance Ranking</h3>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">
+                        Rule-based 100-point performance calculation weighted across resolution rate, SLA timeliness, quality score, and evidence completeness.
+                    </p>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Ward</th>
+                            <th>Performance Score</th>
+                            <th>Grade</th>
+                            <th>Sample Size</th>
+                            <th>Resolution Rate</th>
+                            <th>Avg Resolution Time</th>
+                            <th>Verified Rate</th>
+                            <th>Evidence Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminWardRankingsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 4: CATEGORY PERFORMANCE MATRIX -->
+        <div id="tab-category-matrix" class="tab-pane">
+            <div class="table-card">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700;">Issue Category Performance Matrix</h3>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">
+                        Identify recurring infrastructure bottlenecks across civil domains
+                    </p>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Total Reported</th>
+                            <th>Resolved</th>
+                            <th>Resolution Rate</th>
+                            <th>Avg Quality Score</th>
+                            <th>Avg Resolution Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminCategoryMatrixBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- MODAL 1: SUBMIT RESOLUTION EVIDENCE -->
+    <div id="resolutionModal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="resModalTitle">Submit Resolution Evidence</h3>
+                <button type="button" class="modal-close-btn" onclick="closeResolutionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="resModalComplaintId">
+
+                <div style="margin-bottom: 1rem; padding: 0.8rem; background: #f8fafc; border-radius: 8px; font-size: 0.88rem;">
+                    <div><strong>Issue:</strong> <span id="resModalIssueType">-</span> | <strong>Ward:</strong> <span id="resModalWard">-</span></div>
+                    <div style="color: #64748b; margin-top: 4px;"><strong>Citizen Description:</strong> <span id="resModalDescription">-</span></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Official Resolution Photograph (After-Work Evidence) <span>*</span></label>
+                    <div class="file-dropzone" id="fileDropzone" onclick="document.getElementById('resolutionFileInput').click()">
+                        <div id="fileUploadPrompt">
+                            <p style="font-weight: 600; color: #0f172a;">Click to select photo or drag & drop</p>
+                            <span class="hint-text">JPEG, PNG, WebP up to 5 MB (Stored in Firebase Storage)</span>
+                        </div>
+                        <input type="file" id="resolutionFileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                        <div id="fileSelectedInfo" style="display: none; margin-top: 8px; color: #0284c7; font-weight: 600;"></div>
+                    </div>
+                    <div id="uploadProgressContainer" style="display: none; margin-top: 8px;">
+                        <div class="upload-progress">
+                            <div class="upload-progress-fill" id="uploadProgressFill"></div>
+                        </div>
+                        <small id="uploadProgressStatus" style="color: #64748b; font-size: 0.75rem;">Uploading to Firebase Storage: 0%</small>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Or External Image URL (Fallback / Unverified Evidence)</label>
+                    <input type="url" id="resolutionUrlInput" placeholder="https://example.com/repaired-photo.jpg">
+                    <small class="hint-text">Note: External links receive lower evidence score weight.</small>
+                </div>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Resolution Work Description <span>*</span></label>
+                    <textarea id="resolutionDescriptionInput" rows="3" placeholder="Describe the physical repair/resolution performed (at least 20 characters recommended)..." required></textarea>
+                </div>
+
+                <p id="resModalError" style="color: #dc2626; font-size: 0.85rem; font-weight: 600; display: none; margin-top: 8px;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-dark" onclick="closeResolutionModal()">Cancel</button>
+                <button type="button" id="submitResolutionBtn" class="btn btn-sm btn-primary">Submit for Verification</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: BEFORE VS AFTER VERIFICATION MODAL -->
+    <div id="verificationModal" class="modal-backdrop">
+        <div class="modal-box" style="max-width: 760px;">
+            <div class="modal-header">
+                <h3>Before vs After Resolution Verification</h3>
+                <button type="button" class="modal-close-btn" onclick="closeVerificationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="verifyModalComplaintId">
+
+                <!-- SIDE-BY-SIDE BEFORE / AFTER -->
+                <div class="proof-comparison-grid">
+                    <div class="proof-card">
+                        <div class="proof-header before">BEFORE: Citizen Report Photo</div>
+                        <div id="verifyModalBeforeContainer"></div>
+                    </div>
+                    <div class="proof-card">
+                        <div class="proof-header after">AFTER: Officer Resolution Evidence</div>
+                        <div id="verifyModalAfterContainer"></div>
+                    </div>
+                </div>
+
+                <!-- RESOLUTION DETAILS & SCORE PREVIEW -->
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
+                    <h4 style="font-size: 0.95rem; margin-bottom: 6px; color: #0f172a;">Resolution Summary</h4>
+                    <p style="font-size: 0.88rem; color: #334155;" id="verifyModalDescription">-</p>
+                    <div style="margin-top: 8px; font-size: 0.8rem; color: #64748b;" id="verifyModalMeta">-</div>
+                </div>
+
+                <!-- PRELIMINARY SCORE PREVIEW -->
+                <div id="verifyModalScorePreview" style="margin-bottom: 1rem;"></div>
+
+                <!-- REJECTION / REWORK INPUT BOX (TOGGLED ON DEMAND) -->
+                <div id="rejectionReasonBox" style="display: none; background: #fff1f2; border: 1px solid #fecdd3; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <label style="display: block; font-weight: 700; color: #9f1239; font-size: 0.88rem; margin-bottom: 4px;">
+                        Rejection / Rework Reason <span>*</span>
+                    </label>
+                    <textarea id="rejectionReasonInput" rows="2" placeholder="Specify why the resolution evidence was rejected (e.g. debris not cleared, incomplete patch)..." style="width: 100%; padding: 8px; border: 1px solid #fca5a5; border-radius: 6px;"></textarea>
+                </div>
+
+                <p id="verifyModalError" style="color: #dc2626; font-size: 0.85rem; font-weight: 600; display: none; margin-top: 8px;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-dark" onclick="closeVerificationModal()">Close</button>
+                <button type="button" id="verifyRejectBtn" class="btn btn-sm btn-danger">Reject / Request Rework</button>
+                <button type="button" id="verifyApproveBtn" class="btn btn-sm btn-success">Verify & Resolve</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE & SCRIPT MODULES -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+
+    <!-- LOGOUT HANDLER -->
+    <script type="module">
+        import { auth } from "./firebase.js";
+        import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.href = "admin-login.html";
+        });
+    </script>
+</body>
+</html>
